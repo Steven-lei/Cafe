@@ -1,7 +1,13 @@
 <?php
+//ini_set('display_errors', 1);
+//ini_set('display_startup_errors', 1);
+//error_reporting(E_ALL);
+//require 'AWSSDK/aws.phar';
+// Use Composer autoloader instead of PHAR
+require 'vendor/autoload.php';
 
-require 'AWSSDK/aws.phar';
-
+use Aws\SecretsManager\SecretsManagerClient;
+use Aws\Exception\AwsException;
 //Get the application environment parameters from the Parameter Store.
 
 $az = file_get_contents('http://169.254.169.254/latest/meta-data/placement/availability-zone');
@@ -12,53 +18,32 @@ $secrets_client = new Aws\SecretsManager\SecretsManagerClient([
   'region'  => $region
 ]);
 
-$showServerInfo = "";
-$timeZone = "";
-$currency = "";
-$db_url = "";
-$db_name = "";
-$db_user = "";
-$db_password = "";
-
-try {
-  $db_url = $secrets_client->getSecretValue([
-    'SecretId' => '/cafe/dbUrl'
-  ]);
-  $db_url = $db_url["SecretString"];
-  $db_user = $secrets_client->getSecretValue([
-    'SecretId' => '/cafe/dbUser'
-  ]);
-  $db_user = $db_user["SecretString"];
-  $db_password = $secrets_client->getSecretValue([
-    'SecretId' => '/cafe/dbPassword'
-  ]);
-  $db_password = $db_password["SecretString"];
-  $db_name = $secrets_client->getSecretValue([
-    'SecretId' => '/cafe/dbName'
-  ]);
-  $db_name = $db_name["SecretString"];
-  $currency = $secrets_client->getSecretValue([
-    'SecretId' => '/cafe/currency'
-  ]);
-  $currency = $currency["SecretString"];  
-  $timezone = $secrets_client->getSecretValue([
-    'SecretId' => '/cafe/timeZone'
-  ]);
-  $timezone = $timezone["SecretString"];  
-  $showServerInfo = $secrets_client->getSecretValue([
-    'SecretId' => '/cafe/showServerInfo'
-  ]);
-  $showServerInfo = $showServerInfo["SecretString"];  
-
-}
-catch (Exception $e) {
+$secretName = "AnyGroup-RDSSecret";
   $db_url = '';
   $db_name = '';
   $db_user = '';
   $db_password = '';
-  $showServerInfo = '';
+  $showServerInfo = true;
   $timeZone = '';
   $currency = '';
+try {
+    $result = $secrets_client->getSecretValue([
+        'SecretId' => $secretName,
+    ]);
+
+    if (isset($result['SecretString'])) {
+        $secret = json_decode($result['SecretString'], true);
+        $db_url = $secret['host'];
+        $db_name = $secret['dbname'];
+        $db_user = $secret['username'];
+        $db_password = $secret['password'];
+
+  //      echo "DB host: $db_url\n";
+  //      echo "DB user: $db_user\n";
+//      echo "DB name: $db_name\n";
+    }
+} catch (AwsException $e) {
+    echo "Error retrieving secret: " . $e->getMessage();
 }
 #error_log('Settings are: ' . $ep. " / " . $db_name . " / " . $db_user . " / " . $db_password);
 ?>
