@@ -1,6 +1,6 @@
 -- MySQL dump 10.19  Distrib 10.2.38-MariaDB, for Linux (x86_64)
 --
--- Host: localhost    Database: cafe_db
+-- Host: localhost    Database: cafe
 -- ------------------------------------------------------
 -- Server version	10.2.38-MariaDB
 
@@ -16,12 +16,12 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Current Database: `cafe_db`
+-- Current Database: `cafe`
 --
 
-CREATE DATABASE /*!32312 IF NOT EXISTS*/ `cafe_db` /*!40100 DEFAULT CHARACTER SET latin1 */;
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `cafe` /*!40100 DEFAULT CHARACTER SET latin1 */;
 
-USE `cafe_db`;
+USE `cafe`;
 
 --
 -- Table structure for table `order`
